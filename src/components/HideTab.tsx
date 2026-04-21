@@ -24,14 +24,22 @@ export function HideTab() {
   const capacity = dims ? capacityBytes(dims.w, dims.h) - 36 : 0;
   const usage = useMemo(() => new Blob([message]).size, [message]);
 
+  const [converted, setConverted] = useState(false);
+
   async function pickFile(f: File) {
-    if (f.type !== "image/png") {
-      setStatus({ kind: "err", msg: "Only PNG images are accepted (lossless)." });
+    const supported = ["image/png", "image/jpeg", "image/webp"];
+    if (!supported.includes(f.type)) {
+      setStatus({ kind: "err", msg: "Only PNG, JPEG, or WEBP images are accepted." });
       return;
     }
     setFile(f);
     setOutUrl(null);
-    setStatus({ kind: "idle" });
+    setConverted(f.type !== "image/png");
+    setStatus(
+      f.type !== "image/png"
+        ? { kind: "ok", msg: "Image will be converted to PNG to preserve hidden data." }
+        : { kind: "idle" },
+    );
     const img = await loadImageFile(f);
     setDims({ w: img.naturalWidth, h: img.naturalHeight });
     if (previewUrl) URL.revokeObjectURL(previewUrl);
