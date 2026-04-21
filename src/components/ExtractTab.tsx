@@ -13,8 +13,9 @@ export function ExtractTab() {
   const [copied, setCopied] = useState(false);
 
   async function pickFile(f: File) {
-    if (f.type !== "image/png") {
-      setStatus({ kind: "err", msg: "Only PNG images are accepted." });
+    const supported = ["image/png", "image/jpeg", "image/webp"];
+    if (!supported.includes(f.type)) {
+      setStatus({ kind: "err", msg: "Only PNG, JPEG, or WEBP images are accepted." });
       return;
     }
     setFile(f);
