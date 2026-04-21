@@ -6,7 +6,11 @@ interface Props {
   hint?: string;
 }
 
-export function DropZone({ onFile, accept = "image/png", hint = "PNG only" }: Props) {
+export function DropZone({
+  onFile,
+  accept = "image/png,image/jpeg,image/webp",
+  hint = "PNG, JPEG, or WEBP",
+}: Props) {
   const [over, setOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -14,7 +18,8 @@ export function DropZone({ onFile, accept = "image/png", hint = "PNG only" }: Pr
     (files: FileList | null) => {
       if (!files || files.length === 0) return;
       const file = files[0];
-      if (accept && !file.type.match(accept.replace("*", ".*"))) {
+      const allowed = accept.split(",").map((s) => s.trim());
+      if (allowed.length && !allowed.some((a) => file.type === a || file.type.match(a.replace("*", ".*")))) {
         alert("Invalid file type. " + hint);
         return;
       }
